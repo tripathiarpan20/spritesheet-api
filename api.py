@@ -1569,7 +1569,7 @@ if RN50x64 is True: clip_models.append(clip.load('RN50x64', jit=False)[0].eval()
 if RN101 is True: clip_models.append(clip.load('RN101', jit=False)[0].eval().requires_grad_(False).to(device)) 
 
 normalize = T.Normalize(mean=[0.48145466, 0.4578275, 0.40821073], std=[0.26862954, 0.26130258, 0.27577711])
-lpips_model = lpips.LPIPS(net='vgg', model_path = os.path.join(model_path, 'vgg.pth')).to(device)
+lpips_model = lpips.LPIPS(pretrained = True, net='vgg', model_path = os.path.join(model_path, 'vgg.pth')).to(device)
 
 """# 3. Settings"""
 
