@@ -1398,7 +1398,7 @@ model_secondary_link = 'https://v-diffusion.s3.us-west-2.amazonaws.com/secondary
 model_spritesheetdiffusion_path = f'{model_path}/spritesheetdiffusion.pt'
 model_secondary_path = f'{model_path}/secondary_model_imagenet_2.pth'
 
-model_spritesheetdiffusion_downloaded = False
+model_spritesheetdiffusion_downloaded = True
 model_secondary_downloaded = False
 
 
@@ -1412,15 +1412,9 @@ if diffusion_model == 'spritesheetdiffusion':
     if hash == model_spritesheetdiffusion_SHA:
       print('Sprite Sheet Diffusion SHA matches')
       model_spritesheetdiffusion_downloaded = True
-    else: 
-      print("Sprite Sheet Diffusion doesn't match, redownloading...")
-      wget(model_spritesheetdiffusion_link, model_path)
-      model_spritesheetdiffusion_downloaded = True
+
   elif os.path.exists(model_spritesheetdiffusion_path) and not check_model_SHA or model_spritesheetdiffusion_downloaded == True:
     print('Sprite Sheet Diffusion already downloaded, check check_model_SHA if the file is corrupt')
-  else:  
-    wget(model_spritesheetdiffusion_link, model_path)
-    model_spritesheetdiffusion_downloaded = True
 
 
 # Download the secondary diffusion model v2
