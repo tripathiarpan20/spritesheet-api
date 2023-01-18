@@ -25,6 +25,14 @@ os.environ['KMP_DUPLICATE_LIB_OK']='TRUE'
 PROJECT_DIR = os.path.abspath(os.getcwd())
 USE_ADABINS = True
 
+sys.path.append(os.path.join(root_path, 'CLIP'))
+sys.path.append(os.path.join(root_path, 'guided-diffusion'))
+sys.path.append(os.path.join(root_path, 'ResizeRight'))
+sys.path.append(os.path.join(root_path, 'pytorch3d-lite'))
+sys.path.append(os.path.join(root_path, 'MiDaS'))
+sys.path.append(root_path)
+sys.path.append(os.path.join(root_path, 'AdaBins'))
+
 from CLIP import clip
 from guided_diffusion.script_util import create_model_and_diffusion
 from resize_right import resize
