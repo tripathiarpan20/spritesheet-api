@@ -1,59 +1,11 @@
-import subprocess
 
-simple_nvidia_smi_display = True
-ignore_bad_gpu_error = True
-
-if simple_nvidia_smi_display:
-  nvidiasmi_output = subprocess.run(['nvidia-smi', '-L'], stdout=subprocess.PIPE).stdout.decode('utf-8')
-  print(nvidiasmi_output)
-else:
-  nvidiasmi_output = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE).stdout.decode('utf-8')
-  print(nvidiasmi_output)
-  nvidiasmi_ecc_note = subprocess.run(['nvidia-smi', '-i', '0', '-e', '0'], stdout=subprocess.PIPE).stdout.decode('utf-8')
-  print(nvidiasmi_ecc_note)
-
-nvidiasmi_output = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE).stdout.decode('utf-8')
-cards_requiring_downgrade = ["Tesla T4", "V100"]
-if any(cardstr in nvidiasmi_output for cardstr in cards_requiring_downgrade) and not ignore_bad_gpu_error:    
-    print("<h2 style='color: orange'>Colab gave you a GPU that can't handle default settings</h2>")
-    print("<h4>To avoid issues, either select fewer models or go to Runtime > Disconnect and delete runtime and run this cell again. You can keep doing this until you don't see this message (meaning you got a good GPU)</h4>")
-    print("<h4>If you want to proceed anyway, check `ignore_bad_gpu_error` and run all cells</h4>")
-    raise Exception("Broken GPU")
-
-#@title 1.2 Prepare Folders
 import subprocess, os, sys
 
-def gitclone(url):
-    res = subprocess.run(['git', 'clone', url], stdout=subprocess.PIPE).stdout.decode('utf-8')
-    print(res)
 
-def pipi(modulestr):
-    res = subprocess.run(['pip', 'install', modulestr], stdout=subprocess.PIPE).stdout.decode('utf-8')
-    print(res)
+google_drive = False
+save_models_to_google_drive = False
 
-def pipie(modulestr):
-    res = subprocess.run(['git', 'install', '-e', modulestr], stdout=subprocess.PIPE).stdout.decode('utf-8')
-    print(res)
-
-def wget(url, outputdir):
-    res = subprocess.run(['wget', url, '-P', f'{outputdir}'], stdout=subprocess.PIPE).stdout.decode('utf-8')
-    print(res)
-
-try:
-    from google.colab import drive
-    print("Google Colab detected. Using Google Drive.")
-    google_drive = False
-    save_models_to_google_drive = False 
-except:
-    google_drive = False
-    save_models_to_google_drive = False
-    print("Google Colab not detected.")
-
-if google_drive is True:
-    drive.mount('/content/drive')
-    root_path = '/content/drive/MyDrive/AI/Disco_Diffusion'
-else:
-    root_path = os.getcwd()
+root_path = os.getcwd()
 
 import os
 def createPath(filepath):
@@ -65,13 +17,7 @@ outDirPath = f'{root_path}/images_out'
 createPath(outDirPath)
 
 model_path = f'{root_path}/models'
-createPath(model_path)
-
-
-nvidiasmi_output = subprocess.run(['nvidia-smi'], stdout=subprocess.PIPE).stdout.decode('utf-8')
-cards_requiring_downgrade = ["Tesla T4", "V100"]
-if any(cardstr in nvidiasmi_output for cardstr in cards_requiring_downgrade):
-    downgrade_pytorch_result = subprocess.run(['pip', 'install', 'torch==1.10.2', 'torchvision==0.11.3', '-q'], stdout=subprocess.PIPE).stdout.decode('utf-8')
+# createPath(model_path)
 
 import pathlib, shutil, os, sys
 os.environ['KMP_DUPLICATE_LIB_OK']='TRUE'
@@ -79,60 +25,13 @@ os.environ['KMP_DUPLICATE_LIB_OK']='TRUE'
 PROJECT_DIR = os.path.abspath(os.getcwd())
 USE_ADABINS = True
 
-root_path = os.getcwd()
-model_path = f'{root_path}/models'
+from CLIP import clip
+from guided_diffusion.script_util import create_model_and_diffusion
+from resize_right import resize
+import py3d_tools
+from midas.dpt_depth import DPTDepthModel
+import disco_xform_utils as dxf
 
-multipip_res = subprocess.run(['pip', 'install', 'lpips', 'datetime', 'timm', 'ftfy', 'einops', 'pytorch-lightning', 'omegaconf'], stdout=subprocess.PIPE).stdout.decode('utf-8')
-print(multipip_res)
-
-try:
-    from CLIP import clip
-except:
-    if not os.path.exists("CLIP"):
-        gitclone("https://github.com/openai/CLIP")
-    sys.path.append(f'{PROJECT_DIR}/CLIP')
-
-try:
-    from guided_diffusion.script_util import create_model_and_diffusion
-except:
-    if not os.path.exists("guided-diffusion"):
-        gitclone("https://github.com/crowsonkb/guided-diffusion")
-    sys.path.append(f'{PROJECT_DIR}/guided-diffusion')
-
-try:
-    from resize_right import resize
-except:
-    if not os.path.exists("ResizeRight"):
-        gitclone("https://github.com/assafshocher/ResizeRight.git")
-    sys.path.append(f'{PROJECT_DIR}/ResizeRight')
-
-try:
-    import py3d_tools
-except:
-    if not os.path.exists('pytorch3d-lite'):
-        gitclone("https://github.com/MSFTserver/pytorch3d-lite.git")
-    sys.path.append(f'{PROJECT_DIR}/pytorch3d-lite')
-
-try:
-    from midas.dpt_depth import DPTDepthModel
-except:
-    if not os.path.exists('MiDaS'):
-        gitclone("https://github.com/isl-org/MiDaS.git")
-    if not os.path.exists('MiDaS/midas_utils.py'):
-        shutil.move('MiDaS/utils.py', 'MiDaS/midas_utils.py')
-    if not os.path.exists(f'{model_path}/dpt_large-midas-2f21e586.pt'):
-        wget("https://github.com/intel-isl/DPT/releases/download/1_0/dpt_large-midas-2f21e586.pt", model_path)
-    sys.path.append(f'{PROJECT_DIR}/MiDaS')
-
-try:
-    sys.path.append(PROJECT_DIR)
-    import disco_xform_utils as dxf
-except:
-    if not os.path.exists("disco-diffusion"):
-        gitclone("https://github.com/alembics/disco-diffusion.git")
-    if not os.path.exists('disco_xform_utils.py'):
-        shutil.move('disco-diffusion/disco_xform_utils.py', 'disco_xform_utils.py')
-    sys.path.append(PROJECT_DIR)
 
 import torch
 from dataclasses import dataclass
@@ -172,19 +71,9 @@ from omegaconf import OmegaConf
 import warnings
 warnings.filterwarnings("ignore", category=UserWarning)
 
-# AdaBins stuff
-if USE_ADABINS:
-    try:
-        from infer import InferenceHelper
-    except:
-        if not os.path.exists("AdaBins"):
-            gitclone("https://github.com/shariqfarooq123/AdaBins.git")
-        if not os.path.exists(f'{PROJECT_DIR}/pretrained/AdaBins_nyu.pt'):
-            createPath(f'{PROJECT_DIR}/pretrained')
-            wget("https://cloudflare-ipfs.com/ipfs/Qmd2mMnDLWePKmgfS8m6ntAg4nhV5VkUyAydYBp8cWWeB7/AdaBins_nyu.pt", f'{PROJECT_DIR}/pretrained')
-        sys.path.append(f'{PROJECT_DIR}/AdaBins')
-    from infer import InferenceHelper
-    MAX_ADABINS_AREA = 500000
+from infer import InferenceHelper
+
+MAX_ADABINS_AREA = 500000
 
 import torch
 DEVICE = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
