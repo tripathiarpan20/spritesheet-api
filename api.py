@@ -1559,10 +1559,10 @@ if use_secondary_model:
     secondary_model.eval().requires_grad_(False).to(device)
 
 clip_models = []
-if ViTB32 is True: clip_models.append(clip.load('ViT-B/32', jit=False)[0].eval().requires_grad_(False).to(device)) 
-if ViTB16 is True: clip_models.append(clip.load('ViT-B/16', jit=False)[0].eval().requires_grad_(False).to(device) ) 
-if ViTL14 is True: clip_models.append(clip.load('ViT-L/14', jit=False)[0].eval().requires_grad_(False).to(device) ) 
-if RN50 is True: clip_models.append(clip.load('RN50', jit=False)[0].eval().requires_grad_(False).to(device))
+if ViTB32 is True: clip_models.append(clip.load(os.path.join(model_path,'ViT-B-32.pt'), jit=False)[0].eval().requires_grad_(False).to(device)) 
+if ViTB16 is True: clip_models.append(clip.load(os.path.join(model_path,'ViT-B-16.pt'), jit=False)[0].eval().requires_grad_(False).to(device) ) 
+if ViTL14 is True: clip_models.append(clip.load(os.path.join(model_path,'ViT-L-14.pt'), jit=False)[0].eval().requires_grad_(False).to(device) ) 
+if RN50 is True: clip_models.append(clip.load(os.path.join(model_path,'RN50.pt'), jit=False)[0].eval().requires_grad_(False).to(device))
 if RN50x4 is True: clip_models.append(clip.load('RN50x4', jit=False)[0].eval().requires_grad_(False).to(device)) 
 if RN50x16 is True: clip_models.append(clip.load('RN50x16', jit=False)[0].eval().requires_grad_(False).to(device)) 
 if RN50x64 is True: clip_models.append(clip.load('RN50x64', jit=False)[0].eval().requires_grad_(False).to(device)) 
