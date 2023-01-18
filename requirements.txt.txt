@@ -1,2 +1,9 @@
 fastapi
 uvicorn
+lpips
+datetime
+timm 
+ftfy
+einops
+pytorch-lightning
+omegaconf
