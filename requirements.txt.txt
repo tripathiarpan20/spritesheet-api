@@ -7,3 +7,5 @@ ftfy
 einops
 pytorch-lightning
 omegaconf
+torch
+torchvision
